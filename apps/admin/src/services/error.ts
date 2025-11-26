@@ -2,12 +2,14 @@ import { inject, Injectable } from '@angular/core';
 import { FlexiToastService } from 'flexi-toast';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ErrorService {
   readonly #toast = inject(FlexiToastService)
+  readonly #router = inject(Router)
 
   handle(err: HttpErrorResponse) {
     const status = err.status;
@@ -17,6 +19,11 @@ export class ErrorService {
       messages.forEach((msg: string) => {
         this.#toast.showToast("Hata!", msg, "error");
       })
+    } else if (status === 401) {
+      const messages = "Tekrar Giriş Yapmanız Gerekiyor.";
+      this.#toast.showToast("Uyarı!", messages, "warning");
+      this.#router.navigateByUrl("/login");
+      localStorage.clear();
     }
   }
 }
